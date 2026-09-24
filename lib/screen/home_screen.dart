@@ -5,6 +5,8 @@ import 'package:weather_app/models/weather_model.dart';
 import '../models/weather_icon_data.dart';
 import '../service/weather_service.dart';
 
+final TextEditingController cityController = TextEditingController();
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -13,26 +15,35 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
+
    final imgUrl =
       "https://res.cloudinary.com/dgbz1qem7/image/upload/v1790155042/53d753683e99169c8d3922589bb2d0e9_xafto2.jpg";
   Weather? weather;
   bool isLoading = false;
   String? error;
 
+
+  @override
+  void dispose() {
+    cityController.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
-    initWeather();
+    initWeather('Hanoi');
   }
 
-  Future<void> initWeather() async {
+  Future<void> initWeather(String city) async {
     setState(() {
       isLoading = true;
       error = null;
     });
 
     try {
-      final result = await WeatherService().getWeather('Hanoi');
+      final result = await WeatherService().getWeather(city);
 
 
 
@@ -94,13 +105,52 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
 
+                       SizedBox(height: 10,),
                        //search
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: [],
+                        children: [
+                          Expanded(
+                              child: TextField(
+                                controller: cityController,
+                                style: const TextStyle(
+                                  color: Colors.white
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: 'Nhập thành phố...',
+                                  hintStyle: const TextStyle(
+                                    color: Colors.white70
+                                  ),
+                                  prefixIcon: const Icon(
+                                    Icons.search_rounded,
+                                    color: Colors.white,
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.black26,
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide: BorderSide.none
+                                  )
+                                ),
+
+                                //bam enter tren bang phim
+                                onSubmitted: (_) {
+                                  searchCity();
+                                },
+                              )),
+                          const SizedBox(height: 8,),
+
+                          IconButton(
+                            onPressed: searchCity,
+                            icon: const Icon(
+                              Icons.search,
+                              color: Colors.white,
+                            ),
+                          )
+                        ],
                       ),
 
-                       const SizedBox(height: 10,),
+                       const SizedBox(height: 40,),
 
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -111,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
-                                fontSize: 96,
+                                fontSize: 82,
                                 height: 1
                             ),
                           ),
@@ -211,6 +261,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
     );
   }
+
+
+  //search logic
+   void searchCity() {
+     final city = cityController.text.trim();
+
+     if (city.isEmpty) {
+       return;
+     }
+
+     initWeather(city);
+   }
 }
 
 
@@ -341,3 +403,4 @@ String translateCondition(String condition) {
 
   return condition;
 }
+
