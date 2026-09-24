@@ -6,9 +6,9 @@ import 'package:weather_app/models/weather_model.dart';
 class WeatherService {
   Future<Weather> getWeather(String city) async {
     final url = Uri.parse(
-      'https://api.weatherapi.com/v1/current.json'
+      'https://api.weatherapi.com/v1/forecast.json'
       '?key=d07e5e8a2ddf4c93b3482226261409'
-      '&q=Hanoi',
+      '&q=$city',
     );
 
     final response = await http.get(url);
